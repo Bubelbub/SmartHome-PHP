@@ -1,0 +1,27 @@
+{
+	"name": "bubelbub/smarthome-php",
+	"type": "library",
+	"description": "PHP Library for SmartHome",
+	"keywords": ["collection", "smarthome", "smart", "home", "library"],
+	"homepage": "http://www.smarthome-gui.de",
+	"license": "MIT",
+	"require": {
+		"php": ">=5.3.3"
+	},
+	"authors": [
+		{
+			"name": "Bubelbub",
+			"email": "bubelbub@gmail.com"
+		}
+	],
+	"authors": [
+		{"name": "Bubelbub", "email": "bubelbub@gmail.com"}
+	],
+	"autoload": {
+		"psr-0": { "Bubelbub\\SmartHomePHP": "" }
+	},
+	"target-dir": "Bubelbub/SmartHomePHP",
+	"archive": {
+		"exclude": ["!vendor", "tests", "*phpunit.xml", ".travis.yml", "build.xml", "build.properties", "composer.phar"]
+	}
+}
