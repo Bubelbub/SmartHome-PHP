@@ -24,7 +24,7 @@ class LoginRequest extends BaseRequest
 		$this->smartHome->setSessionId(null);
 		$req = $this->getRequest();
 		$req['UserName'] = $this->smartHome->getUsername();
-		$req['Password'] = self::encrypt($this->smartHome->getPassword());
+		$req['Password'] = $this->smartHome->getIsPasswordEncrypted() === true ? $this->smartHome->getPassword() : self::encrypt($this->smartHome->getPassword());
 
 		$response = parent::send($expectedResponse, $useSession, $try);
 		$this->smartHome->setSessionId((string) $response['SessionId']);
@@ -38,6 +38,6 @@ class LoginRequest extends BaseRequest
 	 */
 	static function encrypt($password)
 	{
-		return base64_encode(hash('sha256', utf8_encode($password), true));
+		return base64_encode(hash('sha256', $password, true));
 	}
 }

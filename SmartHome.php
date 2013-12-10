@@ -43,6 +43,11 @@ class SmartHome
 	private $password;
 
 	/**
+	 * @var bool is the password saved encrypted?
+	 */
+	private $isPasswordEncrypted = false;
+
+	/**
 	 * @var string the session id of the last requests
 	 */
 	private $sessionId;
@@ -226,6 +231,22 @@ class SmartHome
 	public function getPassword()
 	{
 		return $this->password;
+	}
+
+	/**
+	 * @param boolean $isPasswordEncrypted
+	 */
+	public function setIsPasswordEncrypted($isPasswordEncrypted)
+	{
+		$this->isPasswordEncrypted = $isPasswordEncrypted;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getIsPasswordEncrypted()
+	{
+		return $this->isPasswordEncrypted;
 	}
 
 	/**
