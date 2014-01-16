@@ -50,11 +50,24 @@ class SetActuatorStatesRequest extends BaseRequest
 	public function addRoomTemperatureActuatorState($logicalDeviceId, $pointTemperature, $mode)
 	{
 		$this->actuatorStates[] = array(
-			'xsi:type' => 'RoomTemperatureActuatorState',
+			'xmlns:xsi:type' => 'RoomTemperatureActuatorState',
 			'LID' => $logicalDeviceId,
 			'PtTmp' => $pointTemperature,
 			'OpnMd' => $mode,
 			'WRAc' => false
+		);
+	}
+	
+	/**
+	 * @param string $logicalDeviceId the logical device id
+	 * @param bool $value the state to set
+	 */
+	public function addSwitchActuatorState($logicalDeviceId, $value)
+	{
+		$this->actuatorStates[] = array(
+			'xmlns:xsi:type' => 'SwitchActuatorState',
+			'LID' => $logicalDeviceId,
+			'IsOn' => $value
 		);
 	}
 }
