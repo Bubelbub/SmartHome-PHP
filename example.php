@@ -18,9 +18,30 @@ require_once 'Request/GetShcTypeRequest.php';
 require_once 'Request/GetAllPhysicalDeviceStatesRequest.php';
 require_once 'Request/GetMessageListRequest.php';
 
-$newLine = php_sapi_name() == 'cli' ? "\n" : '<br />';
+use \Bubelbub\SmartHomePHP\Request\SetActuatorStatesRequest;
+
+$newLine = php_sapi_name() == 'cli' ? PHP_EOL : '<br />';
+
+$config = new SimpleXMLElement('<SmartHomeConfiguration />');
+$configFile = __FILE__ . '.config';
+if(file_exists($configFile))
+{
+	try{$config = new SimpleXMLElement($configFile, 0, true);}catch(Exception $ex){}
+}
 
 $sh = new \Bubelbub\SmartHomePHP\SmartHome('Hostname or IP address', 'Username', 'Password');
+
+if(!file_exists($configFile))
+{
+	$config->addChild('SessionId', $sh->getSessionId());
+	$config->addChild('Version', $sh->getVersion());
+	$config->addChild('ConfigurationVersion', $sh->getConfigVersion());
+	$config->saveXML($configFile);
+}
+
+$sh->setSessionId((string) $config->SessionId);
+$sh->setVersion((string) $config->Version);
+$sh->setConfigVersion((string) $config->ConfigurationVersion);
 
 // get your current session id
 echo 'Your session id is ' . $sh->getSessionId() . $newLine;
