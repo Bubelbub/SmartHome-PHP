@@ -19,6 +19,7 @@ use Bubelbub\SmartHomePHP\Request\GetShcInformationRequest;
 use Bubelbub\SmartHomePHP\Request\GetShcTypeRequest;
 use Bubelbub\SmartHomePHP\Request\LoginRequest;
 use Bubelbub\SmartHomePHP\Request\ReleaseConfigurationLockRequest;
+use Bubelbub\SmartHomePHP\Request\SetActuatorStatesRequest;
 
 /**
  * Class SmartHome
@@ -187,6 +188,34 @@ class SmartHome
 	{
 		$getMessageListRequest = new GetMessageListRequest($this);
 		return $getMessageListRequest->send();
+	}
+
+	/**
+	 * Set the state of an logical device
+	 *
+	 * @param string $logicalDeviceId the logical device id
+	 * @param boolean $on the new state of the device (true = on, false = off)
+	 * @return \SimpleXMLElement
+	 */
+	function setLogicalDeviceState($logicalDeviceId, $on)
+	{
+		$setActuatorStatesRequest = new SetActuatorStatesRequest($this);
+		$setActuatorStatesRequest->addLogicalDeviceState($logicalDeviceId, $on);
+		return $setActuatorStatesRequest->send();
+	}
+
+	/**
+	 * Set the state of an adapter for example
+	 *
+	 * @param string $logicalDeviceId the logical device id
+	 * @param boolean $on the new state of the device (true = on, false = off)
+	 * @return \SimpleXMLElement
+	 */
+	function setSwitchActuatorState($logicalDeviceId, $on)
+	{
+		$setActuatorStatesRequest = new SetActuatorStatesRequest($this);
+		$setActuatorStatesRequest->addSwitchActuatorState($logicalDeviceId, $on);
+		return $setActuatorStatesRequest->send();
 	}
 
 	/**

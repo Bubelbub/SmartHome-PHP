@@ -8,6 +8,7 @@
  */
 
 namespace Bubelbub\SmartHomePHP\Request;
+use Bubelbub\SmartHomePHP\SmartHome;
 
 /**
  * Class SetActuatorStatesRequest
@@ -17,57 +18,90 @@ namespace Bubelbub\SmartHomePHP\Request;
 class SetActuatorStatesRequest extends BaseRequest
 {
 	/**
-	 * @var array with actuator states
+	 * @var \SimpleXMLElement with actuator states
 	 */
-	private $actuatorStates = array();
+	private $actuatorStates;
 
+	/**
+	 * {@inheritdoc}
+	 */
+	public function __construct(SmartHome $smartHome)
+	{
+		parent::__construct($smartHome);
+
+		/** Prepare the SetActuatorStates request */
+		$request = $this->getRequest();
+		$request->addAttribute('BasedOnConfigVersion', $this->smartHome->getConfigVersion());
+		$this->actuatorStates = $request->addChild('ActuatorStates');
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function send($expectedResponse = 'ControlResultResponse', $useSession = true, $try = 1)
 	{
 		if($this->smartHome->getConfigVersion() === null)
 		{
 			$this->smartHome->login();
 		}
-		$request = $this->getRequest();
-		$request->addAttribute('BasedOnConfigVersion', $this->smartHome->getConfigVersion());
 
-		$actuatorStates = $request->addChild('ActuatorStates');
-		foreach($this->actuatorStates as $actuatorState)
-		{
-			$logicalDeviceState = $actuatorStates->addChild('LogicalDeviceState');
-			foreach($actuatorState as $key => $value)
-			{
-				$logicalDeviceState->addAttribute($key, $value);
-			}
-		}
 		return parent::send($expectedResponse, $useSession, $try);
 	}
 
 	/**
+	 * Sets the temperature and mode for heaters
+	 *
 	 * @param string $logicalDeviceId the logical device id
 	 * @param string|float $pointTemperature the temperature to set
 	 * @param string $mode the mode of temperature actuator (Auto|Manu)
 	 */
 	public function addRoomTemperatureActuatorState($logicalDeviceId, $pointTemperature, $mode)
 	{
-		$this->actuatorStates[] = array(
-			'xmlns:xsi:type' => 'RoomTemperatureActuatorState',
-			'LID' => $logicalDeviceId,
-			'PtTmp' => $pointTemperature,
-			'OpnMd' => $mode,
-			'WRAc' => false
-		);
+		if((int) $pointTemperature < 6) { $pointTemperature = 6; }
+		if((int) $pointTemperature > 30) { $pointTemperature = 30; }
+		if(!preg_match('#^[0-9]+(\.[05]+)?$#i', $pointTemperature))
+		{
+			throw new \Exception('The parameter "PointTemperature" should be a value like "6.0" "6.5" "12" "12.5" ..."');
+		}
+
+		$logicalDeviceState = $this->actuatorStates->addChild('LogicalDeviceState');
+		$logicalDeviceState->addAttribute('xmlns:xsi:type', 'RoomTemperatureActuatorState');
+		$logicalDeviceState->addAttribute('LID', $logicalDeviceId);
+		$logicalDeviceState->addAttribute('PtTmp', $pointTemperature);
+		$logicalDeviceState->addAttribute('OpnMd', ucfirst(strtolower($mode)));
+		$logicalDeviceState->addAttribute('WRAc', 'false');
 	}
 	
 	/**
+	 * Sets the on/off state for adapters
+	 *
 	 * @param string $logicalDeviceId the logical device id
-	 * @param bool $value the state to set
+	 * @param bool $value the state to set (on=true/off=false)
 	 */
 	public function addSwitchActuatorState($logicalDeviceId, $value)
 	{
-		$this->actuatorStates[] = array(
-			'xmlns:xsi:type' => 'SwitchActuatorState',
-			'LID' => $logicalDeviceId,
-			'IsOn' => $value
-		);
+		$logicalDeviceState = $this->actuatorStates->addChild('LogicalDeviceState');
+		$logicalDeviceState->addAttribute('xmlns:xsi:type', 'SwitchActuatorState');
+		$logicalDeviceState->addAttribute('LID', $logicalDeviceId);
+		$logicalDeviceState->addAttribute('IsOn', preg_match('#^(on|1|true)$#i', (string) $value) ? 'true' : 'false');
+	}
+
+	/**
+	 * Currently unknown!?
+	 *
+	 * @param string $logicalDeviceId the logical device id
+	 * @param bool $value the new state of the device (true = on, false = off)
+	 */
+	public function addLogicalDeviceState($logicalDeviceId, $value)
+	{
+		$logicalDeviceState = $this->actuatorStates->addChild('LogicalDeviceState');
+		$logicalDeviceState->addAttribute('xmlns:xsi:type', 'GenericDeviceState');
+		$logicalDeviceState->addAttribute('LID', $logicalDeviceId);
+
+		$ppts = $logicalDeviceState->addChild('Ppts');
+		$ppt = $ppts->addChild('Ppt');
+		$ppt->addAttribute('xmlns:xsi:type', 'BooleanProperty');
+		$ppt->addAttribute('Name', 'Value');
+		$ppt->addAttribute('Value', $value ? 'true' : 'false'); // text!
 	}
 }
