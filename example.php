@@ -57,3 +57,15 @@ print_r($sh->getAllLogicalDeviceStates());
 
 // Get all messages
 print_r($sh->getMessageList());
+
+// Set room temperature of heater to 18°C
+/*
+	$setActuatorStatesRequest = new SetActuatorStatesRequest($sh);
+	$setActuatorStatesRequest->addRoomTemperatureActuatorState('id of heater (LID)', 12, 'auto');
+	$setActuatorStatesRequest->send();
+*/
+
+// Switch on your adapter for computer
+//$sh->setSwitchActuatorState('id of computer adapter (LID)', 'on'); // 'on' could be true, too
+
+// Now you could wake your computer up! (@since 30.03.2014)
