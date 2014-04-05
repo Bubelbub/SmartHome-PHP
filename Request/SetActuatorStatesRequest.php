@@ -104,4 +104,18 @@ class SetActuatorStatesRequest extends BaseRequest
 		$ppt->addAttribute('Name', 'Value');
 		$ppt->addAttribute('Value', $value ? 'true' : 'false'); // text!
 	}
+
+	/**
+	 * Set the shutter level of shutters
+	 *
+	 * @param string $logicalDeviceId the logical device id
+	 * @param integer $shutterLevel the new shutter level of the device in percent (0 - 100)
+	 */
+	public function addRollerShutter($logicalDeviceId, $shutterLevel)
+	{
+		$logicalDeviceState = $this->actuatorStates->addChild('LogicalDeviceState');
+		$logicalDeviceState->addAttribute('xmlns:xsi:type', 'RollerShutterActuatorState');
+		$logicalDeviceState->addAttribute('LID', $logicalDeviceId);
+		$logicalDeviceState->addChild('ShutterLevel', $shutterLevel);
+	}
 }
