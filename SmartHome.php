@@ -20,6 +20,8 @@ use Bubelbub\SmartHomePHP\Request\GetShcTypeRequest;
 use Bubelbub\SmartHomePHP\Request\LoginRequest;
 use Bubelbub\SmartHomePHP\Request\ReleaseConfigurationLockRequest;
 use Bubelbub\SmartHomePHP\Request\SetActuatorStatesRequest;
+use Bubelbub\SmartHomePHP\Entity\Location;
+use Bubelbub\SmartHomePHP\Entity\SwitchActuator;
 
 /**
  * Class SmartHome
@@ -57,12 +59,16 @@ class SmartHome
 	 * @var string the version of shc
 	 */
 	private $version;
+	
+	private $locations = null;
+	
+	private $logicalDevices = null;
 
 	/**
 	 * @var string the configuration version of entities etc.
 	 */
 	private $configVersion;
-
+	
 	/**
 	 * @param string $host the hostname/ip address of the shc
 	 * @param string $username the username of shc user/owner
@@ -131,9 +137,41 @@ class SmartHome
 	{
 		$getEntitiesRequest = new GetEntitiesRequest($this);
 		$getEntitiesRequest->setEntityType($entityType);
-		return $getEntitiesRequest->send();
+		$response =  $getEntitiesRequest->send();
+		
+		// create all Location objects
+		if ($entityType == 'Configuration' or $entityType == 'Locations') {
+			foreach ($response->LCs->LC as $location) {
+				$this->locations[(String) $location->Id] = 
+					new Location(
+						(String) $location->Id, 
+						(String) $location->Name, 
+						(String) $location->Position
+					);
+			}
+		}
+		
+		// create all LogicalDevice objects
+		if($entityType == 'Configuration' or $entityType == 'LogicalDevices') {
+			foreach ($response->LDs->LD as $logicalDevice) {
+				switch ($logicalDevice->attributes('xsi', true)->type) {
+					case 'SwitchActuator':
+						$device = new SwitchActuator();
+						$device->setId((String) $logicalDevice->Id);
+						$device->setName((String) $logicalDevice['Name']);
+						$device->setLocationId((String) $logicalDevice['LCID']);
+						$device->setBaseDeviceId((String) $logicalDevice->BDId);
+						$device->setActuatorClass((String) $logicalDevice->ActCls);
+						
+						$this->logicalDevices[(String) $logicalDevice->Id] = $device;
+					break;
+				}
+			}
+		}
+		
+		return $response;
 	}
-
+	
 	/**
 	 * @return \SimpleXMLElement
 	 */
@@ -237,6 +275,18 @@ class SmartHome
 		$releaseConfigurationLockRequest = new ReleaseConfigurationLockRequest($this);
 		return $releaseConfigurationLockRequest->send();
 	}
+	
+	function getLocations() {
+		return $this->locations;
+	}
+	
+	function getLocation($id) {
+		return $this->locations[$id];
+	}
+	
+	function setLocations($locations) {
+		$this->locations = $locations;
+	}
 
 	/**
 	 * @return string the host of shc
@@ -328,5 +378,13 @@ class SmartHome
 	public function setConfigVersion($configVersion = null)
 	{
 		$this->configVersion = $configVersion;
+	}
+	
+	public function getLogicalDevices() {
+		return $this->logicalDevices;
+	}
+	
+	public function setLogicalDevices($logicalDevices) {
+		$this->logicalDevices = $logicalDevices;
 	}
 }
