@@ -60,8 +60,14 @@ class SmartHome
 	 */
 	private $version;
 	
+	/**
+	 * @var array array of all locations
+	 */
 	private $locations = null;
 	
+	/**
+	 * @var array array of all logicalDevices
+	 */
 	private $logicalDevices = null;
 
 	/**
@@ -276,10 +282,21 @@ class SmartHome
 		return $releaseConfigurationLockRequest->send();
 	}
 	
+	/**
+	 * Returns an array of all locations
+	 * 
+	 * @return array
+	 */
 	function getLocations() {
 		return $this->locations;
 	}
 	
+	/**
+	 * Returns the location with the given id
+	 * 
+	 * @param string $id
+	 * @return array
+	 */
 	function getLocation($id) {
 		return $this->locations[$id];
 	}
@@ -380,10 +397,17 @@ class SmartHome
 		$this->configVersion = $configVersion;
 	}
 	
+	/**
+	 * Returns an array of all LogicalDevices
+	 * @return array
+	 */
 	public function getLogicalDevices() {
 		return $this->logicalDevices;
 	}
 	
+	/**
+	 * @param array $logicalDevices
+	 */
 	public function setLogicalDevices($logicalDevices) {
 		$this->logicalDevices = $logicalDevices;
 	}
