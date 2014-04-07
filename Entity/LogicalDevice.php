@@ -9,6 +9,23 @@ namespace Bubelbub\SmartHomePHP\Entity;
  */
 class LogicalDevice {
 	
+	const DEVICE_TYPE_SWITCH_ACTUATOR = 'SwitchActuator';
+	const DEVICE_TYPE_WINDOW_DOOR_SENSOR = 'WindowDoorSensor';
+	const DEVICE_TYPE_PUSH_BUTTON_SENSOR = 'PushButtonSensor';
+	const DEVICE_TYPE_THERMOSTAT_ACTUATOR = 'ThermostatActuator';
+	const DEVICE_TYPE_VALVE_ACTUATOR = 'ValveActuator';
+	const DEVICE_TYPE_ROOM_TEMPERATURE_ACTUATOR = 'RoomTemperatureActuator';
+	const DEVICE_TYPE_TEMPERATURE_SENSOR = 'TemperatureSensor';
+	const DEVICE_TYPE_ROOM_TEMPERATURE_SENSOR = 'RoomTemperatureSensor';
+	const DEVICE_TYPE_HUMIDITY_SENSOR = 'HumiditySensor';
+	const DEVICE_TYPE_ROOM_HUMIDITY_SENSOR = 'RoomHumiditySensor';
+	const DEVICE_TYPE_MOTION_DETECTION_SENSOR = 'MotionDetectionSensor';
+	const DEVICE_TYPE_LUMINANCE_SENSOR = 'LuminanceSensor';
+	const DEVICE_TYPE_ALARM_ACTUATOR = 'AlarmActuator';
+	const DEVICE_TYPE_SMOKE_DETECTOR_SENSOR = 'SmokeDetectorSensor';
+	const DEVICE_TYPE_GENERIC_ACTUATOR = 'GenericActuator';
+	const DEVICE_TYPE_GENERIC_SENSOR = 'GenericSensor';
+	
 	/**
 	 * @var string the ID
 	 */
@@ -28,6 +45,11 @@ class LogicalDevice {
 	 * @var string ID of the baseDevice
 	 */
 	private $baseDeviceId;
+	
+	/**
+	 * @var string devicetype
+	 */
+	private $type;
 	
 	/**
 	 * Returns the ID
@@ -94,6 +116,14 @@ class LogicalDevice {
 	 */
 	function setBaseDeviceId($baseDeviceId) {
 		$this->baseDeviceId = $baseDeviceId;
+	}
+	
+	function setType($type) {
+		$this->type = $type;
+	}
+	
+	function getType() {
+		return $this->type;
 	}
 }
 

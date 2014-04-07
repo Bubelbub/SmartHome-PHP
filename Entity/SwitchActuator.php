@@ -13,6 +13,10 @@ class SwitchActuator extends Actuator {
 	 */
 	private $isOn;
 	
+	function __construct() {
+		$this->setType(parent::DEVICE_TYPE_SWITCH_ACTUATOR);
+	}
+	
 	/**
 	 * @return boolean
 	 */
