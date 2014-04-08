@@ -23,6 +23,7 @@ use Bubelbub\SmartHomePHP\Request\SetActuatorStatesRequest;
 use Bubelbub\SmartHomePHP\Entity\Location;
 use Bubelbub\SmartHomePHP\Entity\SwitchActuator;
 use Bubelbub\SmartHomePHP\Entity\LogicalDevice;
+use Bubelbub\SmartHomePHP\Entity\WindowDoorSensor;
 
 /**
  * Class SmartHome
@@ -174,7 +175,7 @@ class SmartHome
 						break;
 					
 					case LogicalDevice::DEVICE_TYPE_WINDOW_DOOR_SENSOR:
-						$device = new \WindowDoorSensor();
+						$device = new WindowDoorSensor();
 						$device->setId((String) $logicalDevice->Id);
 						$device->setName((String) $logicalDevice['Name']);
 						$device->setLocationId((String) $logicalDevice['LCID']);
@@ -225,7 +226,46 @@ class SmartHome
 	public function getAllLogicalDeviceStates()
 	{
 		$getAllLogicalDeviceStatesRequest = new GetAllLogicalDeviceStatesRequest($this);
-		return $getAllLogicalDeviceStatesRequest->send();
+		$response = $getAllLogicalDeviceStatesRequest->send();
+		
+		// update LogicalDevice states
+		foreach ($response->States->LogicalDeviceState as $state) {
+			$device = &$this->logicalDevices[(String) $state['LID']];
+
+			if(is_object($device)) {
+				switch ($device->getType()) {
+					case LogicalDevice::DEVICE_TYPE_SWITCH_ACTUATOR:
+						$device->setIsOn((String) $state['IsOn'] == 'False' ? false : true);
+						debug($device, "SWITCH");
+						break;
+							
+					case LogicalDevice::DEVICE_TYPE_WINDOW_DOOR_SENSOR:
+						break;
+				
+					case LogicalDevice::DEVICE_TYPE_PUSH_BUTTON_SENSOR:
+					case LogicalDevice::DEVICE_TYPE_THERMOSTAT_ACTUATOR:
+					case LogicalDevice::DEVICE_TYPE_VALVE_ACTUATOR:
+					case LogicalDevice::DEVICE_TYPE_ROOM_TEMPERATURE_ACTUATOR:
+					case LogicalDevice::DEVICE_TYPE_TEMPERATURE_SENSOR:
+					case LogicalDevice::DEVICE_TYPE_ROOM_TEMPERATURE_SENSOR:
+					case LogicalDevice::DEVICE_TYPE_HUMIDITY_SENSOR:
+					case LogicalDevice::DEVICE_TYPE_ROOM_HUMIDITY_SENSOR:
+					case LogicalDevice::DEVICE_TYPE_MOTION_DETECTION_SENSOR:
+					case LogicalDevice::DEVICE_TYPE_LUMINANCE_SENSOR:
+					case LogicalDevice::DEVICE_TYPE_ALARM_ACTUATOR:
+					case LogicalDevice::DEVICE_TYPE_SMOKE_DETECTOR_SENSOR:
+					case LogicalDevice::DEVICE_TYPE_GENERIC_ACTUATOR:
+					case LogicalDevice::DEVICE_TYPE_GENERIC_SENSOR:
+						// TO BE DONE...
+						break;
+				
+					default:
+						throw new \Exception('Unknown LogicalDevice type: '.$logicalDevice->attributes('xsi', true)->type);
+				}
+			}
+		}
+		
+		return $response;
 	}
 
 	/**

@@ -1,5 +1,6 @@
 <?php
 
+namespace Bubelbub\SmartHomePHP\Entity;
 use Bubelbub\SmartHomePHP\Entity\LogicalDevice;
 /** 
  * Class WindowDoorSensor
