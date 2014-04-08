@@ -42,6 +42,11 @@ class LogicalDevice {
 	private $locationId;
 	
 	/**
+	 * @var Location the location object
+	 */
+	private $location = NULL;
+	
+	/**
 	 * @var string ID of the baseDevice
 	 */
 	private $baseDeviceId;
@@ -118,12 +123,36 @@ class LogicalDevice {
 		$this->baseDeviceId = $baseDeviceId;
 	}
 	
+	/**
+	 * Sets the type of the logical device
+	 * @param unknown $type
+	 */
 	function setType($type) {
 		$this->type = $type;
 	}
 	
+	/**
+	 * Returns the type of the logical device
+	 * @return string
+	 */
 	function getType() {
 		return $this->type;
+	}
+	
+	/**
+	 * Sets the location object
+	 * @param unknown $location
+	 */
+	function setLocation($location) {
+		$this->location = $location;
+	}
+	
+	/**
+	 * Returns the Location object
+	 * @return \Bubelbub\SmartHomePHP\Entity\Location
+	 */
+	function getLocation() {
+		return $this->location;
 	}
 }
 

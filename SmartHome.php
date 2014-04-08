@@ -168,6 +168,8 @@ class SmartHome
 						$device->setId((String) $logicalDevice->Id);
 						$device->setName((String) $logicalDevice['Name']);
 						$device->setLocationId((String) $logicalDevice['LCID']);
+						if(array_key_exists($device->getLocationId(), $this->locations))
+							$device->setLocation($this->locations[$device->getLocationId()]);
 						$device->setBaseDeviceId((String) $logicalDevice->BDId);
 						$device->setActuatorClass((String) $logicalDevice->ActCls);
 						
@@ -179,6 +181,8 @@ class SmartHome
 						$device->setId((String) $logicalDevice->Id);
 						$device->setName((String) $logicalDevice['Name']);
 						$device->setLocationId((String) $logicalDevice['LCID']);
+						if(array_key_exists($device->getLocationId(), $this->locations))
+							$device->setLocation($this->locations[$device->getLocationId()]);
 						$device->setBaseDeviceId((String) $logicalDevice->BDId);
 						$device->setInstallationType((String) $logicalDevice->Installation);
 						
@@ -235,11 +239,22 @@ class SmartHome
 			if(is_object($device)) {
 				switch ($device->getType()) {
 					case LogicalDevice::DEVICE_TYPE_SWITCH_ACTUATOR:
-						$device->setIsOn((String) $state['IsOn'] == 'False' ? false : true);
-						debug($device, "SWITCH");
+						if((String) $state['IsOn'] == 'True')
+							$device->setState(SwitchActuator::SWITCH_ACTUATOR_STATE_ON);
+						elseif((String) $state['IsOn'] == 'False')
+							$device->setState(SwitchActuator::SWITCH_ACTUATOR_STATE_OFF);
+						else
+							throw new \Exception('Unknown SwitchActuator state "'.(String) $state['IsOn'].'"');
 						break;
 							
 					case LogicalDevice::DEVICE_TYPE_WINDOW_DOOR_SENSOR:
+						if((String) $state->IsOpen == 'true')
+							$device->setState(WindowDoorSensor::WINDOW_DOOR_SENSOR_STATE_OPEN);
+						elseif((String) $state->IsOpen == 'false')
+							$device->setState(WindowDoorSensor::WINDOW_DOOR_SENSOR_STATE_CLOSED);
+						else 
+							throw new \Exception('Unknown WindowDoorSensor state "'.(String) $state->IsOpen.'"');
+						debug($device, "WINDOW");
 						break;
 				
 					case LogicalDevice::DEVICE_TYPE_PUSH_BUTTON_SENSOR:

@@ -8,27 +8,50 @@ namespace Bubelbub\SmartHomePHP\Entity;
  */
 class SwitchActuator extends Actuator {
 	
+	const SWITCH_ACTUATOR_STATE_ON = 'ON';
+	const SWITCH_ACTUATOR_STATE_OFF = 'OFF';
+
 	/**
-	 * @var boolean
+	 * @var String
 	 */
-	private $isOn;
+	private $state = NULL;
 	
+	/**
+	 * constructor 
+	 */
 	function __construct() {
 		$this->setType(parent::DEVICE_TYPE_SWITCH_ACTUATOR);
 	}
 	
 	/**
-	 * @return boolean
+	 * Sets the state
+	 * 
+	 * @param String $state
+	 * @throws \Exception
 	 */
-	function getIsOn() {
-		return $this->isOn;
+	function setState($state) {
+		if($state == (self::SWITCH_ACTUATOR_STATE_ON or self::SWITCH_ACTUATOR_STATE_OFF))
+			$this->state = $state;
+		else
+			throw new \Exception('Invalid SwitchActuator state "'.$state.'"');
 	}
 	
 	/**
-	 * @param boolean $isOn
+	 * Returns the state
 	 */
-	function setIsOn($isOn) {
-		$this->isOn = $isOn;
+	function getState() {
+		return $this->state;
+	}
+	
+	
+	/**
+	 * Returns if the switch is on
+	 * @return boolean
+	 */
+	function isOn() {
+		if(is_null($this->state))
+			throw new \Exception('Unknown SwitchActuator state. Did you call getLogicalDeviceStates?');
+		return $this->state == self::SWITCH_ACTUATOR_STATE_ON;
 	}
 }
 
