@@ -4,7 +4,7 @@ namespace Bubelbub\SmartHomePHP\Entity;
 use Bubelbub\SmartHomePHP\Entity\LogicalDevice;
 
 /** 
- * @author oliverkuhl
+ * @author Ollie
  * 
  */
 class PushButtonSensor extends LogicalDevice {

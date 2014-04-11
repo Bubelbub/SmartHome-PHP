@@ -3,10 +3,15 @@ namespace Bubelbub\SmartHomePHP\Entity;
 
 /**
  *
- * @author oliverkuhl
+ * @author Ollie
  *        
  */
 class RoomTemperatureActuator extends Actuator {
+	
+	/**
+	 * @var array
+	 */
+	private $underlyingDeviceIds = array();
 	
 	/**
 	 * @var float maximal temperature
@@ -213,6 +218,23 @@ class RoomTemperatureActuator extends Actuator {
 		$this->windowOpenTemperature = $windowOpenTemperature;
 		return $this;
 	}
+	
+	/**
+	 * @return array:
+	 */
+	public function getUnderlyingDeviceIds() {
+		return $this->underlyingDeviceIds;
+	}
+	
+	/**
+	 * @param array $underlyingDeviceIds
+	 * @return \Bubelbub\SmartHomePHP\Entity\RoomTemperatureActuator
+	 */
+	public function setUnderlyingDeviceIds($underlyingDeviceIds) {
+		$this->underlyingDeviceIds = $underlyingDeviceIds;
+		return $this;
+	}
+	
 	
 }
 

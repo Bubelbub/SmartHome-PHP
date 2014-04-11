@@ -3,7 +3,7 @@ namespace Bubelbub\SmartHomePHP\Entity;
 
 /**
  *
- * @author oliverkuhl
+ * @author Ollie
  *        
  */
 class ThermostatActuator extends Actuator {
