@@ -8,6 +8,27 @@ namespace Bubelbub\SmartHomePHP\Entity;
  */
 class RoomTemperatureActuator extends Actuator {
 	
+	const ROOM_TEMPERATURE_ACTUATOR_MODE_MANUAL = 'MANUAL';
+	const ROOM_TEMPERATURE_ACTUATOR_MODE_AUTO = 'AUTOMATIC';
+	const ROOM_TEMPERATURE_ACTUATOR_WINDOW_REDUCTION_ACTIVE = 'ACTIVE';
+	const ROOM_TEMPERATURE_ACTUATOR_WINDOW_REDUCTION_INACTIVE = 'INACTIVE';
+
+	
+	/**
+	 * @var float
+	 */
+	private $pointTemperature = NULL;
+	
+	/**
+	 * @var string
+	 */
+	private $operationMode = NULL;
+	
+	/**
+	 * @var boolean
+	 */
+	private $windowReductionMode = NULL;
+	
 	/**
 	 * @var array
 	 */
@@ -234,6 +255,65 @@ class RoomTemperatureActuator extends Actuator {
 		$this->underlyingDeviceIds = $underlyingDeviceIds;
 		return $this;
 	}
+	
+	/**
+	 *
+	 * @return the float
+	 */
+	public function getPointTemperature() {
+		return $this->pointTemperature;
+	}
+	
+	/**
+	 *
+	 * @param $pointTemperature
+	 */
+	public function setPointTemperature($pointTemperature) {
+		$this->pointTemperature = $pointTemperature;
+		return $this;
+	}
+	
+	/**
+	 *
+	 * @return the string
+	 */
+	public function getOperationMode() {
+		return $this->operationMode;
+	}
+	
+	/**
+	 *
+	 * @param
+	 *        	$operationMode
+	 */
+	public function setOperationMode($operationMode) {
+		$this->operationMode = $operationMode;
+		return $this;
+	}
+	
+	/**
+	 *
+	 * @return the boolean
+	 */
+	public function getWindowReductionMode() {
+		return $this->windowReductionMode;
+	}
+	
+	/**
+	 *
+	 * @param
+	 *        	$windowReductionMode
+	 */
+	public function setWindowReductionMode($windowReductionMode) {
+		if(!$windowReductionMode == (self::ROOM_TEMPERATURE_ACTUATOR_WINDOW_REDUCTION_ACTIVE or self::ROOM_TEMPERATURE_ACTUATOR_WINDOW_REDUCTION_INACTIVE))
+			throw new \Exception('Invalid windowReductionMode "'.$windowReductionMode.'"');
+		$this->windowReductionMode = $windowReductionMode;
+		return $this;
+	}
+	
+	
+
+	
 	
 	
 }

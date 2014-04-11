@@ -12,6 +12,14 @@ use Bubelbub\SmartHomePHP\Entity\Actuator;
  */
 class AlarmActuator extends Actuator {
 	
+	const ALARM_ACTUATOR_STATE_ON = 'ON';
+	const ALARM_ACTUATOR_STATE_OFF = 'OFF';
+
+	/**
+	 * @var String
+	 */
+	private $state = NULL;
+		
 	/**
 	 * @var integer
 	 */
@@ -41,4 +49,33 @@ class AlarmActuator extends Actuator {
 		return $this;
 	}
 	
+	/**
+	 * Sets the state
+	 *
+	 * @param String $state
+	 * @throws \Exception
+	 */
+	function setState($state) {
+		if($state == (self::ALARM_ACTUATOR_STATE_ON or self::ALARM_ACTUATOR_STATE_OFF))
+			$this->state = $state;
+		else
+			throw new \Exception('Invalid AlarmActuator state "'.$state.'"');
+	}
+	
+	/**
+	 * Returns the state
+	 */
+	function getState() {
+		return $this->state;
+	}
+	
+	/**
+	 * Returns if the alarm is on
+	 * @return boolean
+	 */
+	function isOn() {
+		if(is_null($this->state))
+			throw new \Exception('Unknown SwitchActuator state. Did you call getLogicalDeviceStates?');
+		return $this->state == self::ALARM_ACTUATOR_STATE_ON;
+	}
 }

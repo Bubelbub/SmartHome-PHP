@@ -11,7 +11,15 @@ use Bubelbub\SmartHomePHP\Entity\LogicalDevice;
  */
 class RoomTemperatureSensor extends LogicalDevice {
 	
+	/**
+	 * @var array
+	 */
 	private $underlyingDeviceIds = array();
+	
+	/**
+	 * @var float
+	 */
+	private $temperature = NULL;
 	
 	/**
 	 */
@@ -35,5 +43,24 @@ class RoomTemperatureSensor extends LogicalDevice {
 		$this->underlyingDeviceIds = $underlyingDeviceIds;
 		return $this;
 	}
+	
+	/**
+	 *
+	 * @return the float
+	 */
+	public function getTemperature() {
+		return $this->temperature;
+	}
+	
+	/**
+	 *
+	 * @param
+	 *        	$temperature
+	 */
+	public function setTemperature($temperature) {
+		$this->temperature = $temperature;
+		return $this;
+	}
+	
 	
 }

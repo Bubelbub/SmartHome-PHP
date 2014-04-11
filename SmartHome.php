@@ -37,6 +37,7 @@ use Bubelbub\SmartHomePHP\Entity\LuminanceSensor;
 use Bubelbub\SmartHomePHP\Entity\AlarmActuator;
 use Bubelbub\SmartHomePHP\Entity\SmokeDetectorSensor;
 use Bubelbub\SmartHomePHP\Entity\GenericActuator;
+use Bubelbub\SmartHomePHP\Entity\GenericSensor;
 
 /**
  * Class SmartHome
@@ -389,7 +390,7 @@ class SmartHome
 						break;
 						
 					case LogicalDevice::DEVICE_TYPE_GENERIC_SENSOR:
-						$device = new SmokeDetectorSensor();
+						$device = new GenericSensor();
 						$device->setId((String) $logicalDevice->Id);
 						$device->setName((String) $logicalDevice['Name']);
 						$device->setLocationId((String) $logicalDevice['LCID']);
@@ -441,6 +442,15 @@ class SmartHome
 							throw new \Exception('Unknown SwitchActuator state "'.(String) $state['IsOn'].'"');
 						break;
 							
+					case LogicalDevice::DEVICE_TYPE_ALARM_ACTUATOR:
+						if((String) $state->IsOn == 'true')
+							$device->setState(AlarmActuator::ALARM_ACTUATOR_STATE_ON);
+						elseif((String) $state->IsOn == 'false')
+							$device->setState(AlarmActuator::ALARM_ACTUATOR_STATE_OFF);
+						else
+							throw new \Exception('Unknown AlarmActuator state "'.(String) $state->IsOn.'"');
+						break;
+							
 					case LogicalDevice::DEVICE_TYPE_WINDOW_DOOR_SENSOR:
 						if((String) $state->IsOpen == 'true')
 							$device->setState(WindowDoorSensor::WINDOW_DOOR_SENSOR_STATE_OPEN);
@@ -450,21 +460,53 @@ class SmartHome
 							throw new \Exception('Unknown WindowDoorSensor state "'.(String) $state->IsOpen.'"');
 						break;
 				
+					case LogicalDevice::DEVICE_TYPE_SMOKE_DETECTOR_SENSOR:
+						if((String) $state->IsSmokeAlarm == 'true')
+							$device->setState(SmokeDetectorSensor::SMOKE_DETECTOR_STATE_SMOKE_ALARM_ON);
+						elseif((String) $state->IsSmokeAlarm == 'false')
+							$device->setState(SmokeDetectorSensor::SMOKE_DETECTOR_STATE_SMOKE_ALARM_OFF);
+						else
+							throw new \Exception('Unknown SmokeDetectorSensor state "'.(String) $state->IsSmokeAlarm.'"');
+						break;
+							
+					case LogicalDevice::DEVICE_TYPE_ROOM_TEMPERATURE_ACTUATOR:
+						$device->setPointTemperature((float) $state['PtTmp']);
+						if((String) $state['OpnMd'] == 'Auto')
+							$device->setOperationMode(RoomTemperatureActuator::ROOM_TEMPERATURE_ACTUATOR_MODE_AUTO);
+						elseif((String) $state['OpnMd'] == 'Manu')
+							$device->setOperationMode(RoomTemperatureActuator::ROOM_TEMPERATURE_ACTUATOR_MODE_MANUAL);
+						else
+							throw new \Exception('Unknown RoomTemperatureActuator state "'.(String) $state['OpnMd'].'"');
+						
+						if((String) $state['WRAc'] == 'False')
+							$device->setWindowReductionMode(RoomTemperatureActuator::ROOM_TEMPERATURE_ACTUATOR_WINDOW_REDUCTION_INACTIVE);
+						elseif((String) $state['WRAc'] == 'True')
+							$device->setWindowReductionMode(RoomTemperatureActuator::ROOM_TEMPERATURE_ACTUATOR_WINDOW_REDUCTION_ACTIVE);
+						else
+							throw new \Exception('Unknown RoomTemperatureActuator mode "'.(String) $state['WRAc'].'"');
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_ROOM_TEMPERATURE_SENSOR:
+						$device->setTemperature((float) $state['Temperature']);
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_ROOM_HUMIDITY_SENSOR:
+						$device->setHumidity((float) $state['Humidity']);
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_LUMINANCE_SENSOR:
+						$device->setLuminance((integer) $state['Luminance']);
+						break;
+						
 					case LogicalDevice::DEVICE_TYPE_PUSH_BUTTON_SENSOR:
 						// has no state
 						break;
 						
 					case LogicalDevice::DEVICE_TYPE_THERMOSTAT_ACTUATOR:
 					case LogicalDevice::DEVICE_TYPE_VALVE_ACTUATOR:
-					case LogicalDevice::DEVICE_TYPE_ROOM_TEMPERATURE_ACTUATOR:
 					case LogicalDevice::DEVICE_TYPE_TEMPERATURE_SENSOR:
-					case LogicalDevice::DEVICE_TYPE_ROOM_TEMPERATURE_SENSOR:
 					case LogicalDevice::DEVICE_TYPE_HUMIDITY_SENSOR:
-					case LogicalDevice::DEVICE_TYPE_ROOM_HUMIDITY_SENSOR:
 					case LogicalDevice::DEVICE_TYPE_MOTION_DETECTION_SENSOR:
-					case LogicalDevice::DEVICE_TYPE_LUMINANCE_SENSOR:
-					case LogicalDevice::DEVICE_TYPE_ALARM_ACTUATOR:
-					case LogicalDevice::DEVICE_TYPE_SMOKE_DETECTOR_SENSOR:
 					case LogicalDevice::DEVICE_TYPE_GENERIC_ACTUATOR:
 					case LogicalDevice::DEVICE_TYPE_GENERIC_SENSOR:
 						// TO BE DONE...
