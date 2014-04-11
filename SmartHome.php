@@ -24,6 +24,10 @@ use Bubelbub\SmartHomePHP\Entity\Location;
 use Bubelbub\SmartHomePHP\Entity\SwitchActuator;
 use Bubelbub\SmartHomePHP\Entity\LogicalDevice;
 use Bubelbub\SmartHomePHP\Entity\WindowDoorSensor;
+use Bubelbub\SmartHomePHP\Entity\PushButtonSensor;
+use Bubelbub\SmartHomePHP\Entity\ThermostatActuator;
+use Bubelbub\SmartHomePHP\Entity\ValveActuator;
+use Bubelbub\SmartHomePHP\Entity\RoomTemperatureActuator;
 
 /**
  * Class SmartHome
@@ -190,9 +194,67 @@ class SmartHome
 						break;
 						
 					case LogicalDevice::DEVICE_TYPE_PUSH_BUTTON_SENSOR:
+						$device = new PushButtonSensor();
+						$device->setId((String) $logicalDevice->Id);
+						$device->setName((String) $logicalDevice['Name']);
+						$device->setLocationId((String) $logicalDevice['LCID']);
+						if(array_key_exists($device->getLocationId(), $this->locations))
+							$device->setLocation($this->locations[$device->getLocationId()]);
+						$device->setBaseDeviceId((String) $logicalDevice->BDId);
+						$device->setButtonCount((Integer) $logicalDevice->ButtonCount);
+						
+						$this->logicalDevices[(String) $logicalDevice->Id] = $device;
+						break;
+						
 					case LogicalDevice::DEVICE_TYPE_THERMOSTAT_ACTUATOR:
+						$device = new ThermostatActuator();
+						$device->setId((String) $logicalDevice->Id);
+						$device->setName((String) $logicalDevice['Name']);
+						$device->setLocationId((String) $logicalDevice['LCID']);
+						if(array_key_exists($device->getLocationId(), $this->locations))
+							$device->setLocation($this->locations[$device->getLocationId()]);
+						$device->setBaseDeviceId((String) $logicalDevice->BDId);
+						$device->setActuatorClass((String) $logicalDevice->ActCls);						
+						
+						$this->logicalDevices[(String) $logicalDevice->Id] = $device;
+						break;
+												
 					case LogicalDevice::DEVICE_TYPE_VALVE_ACTUATOR:
+						$device = new ValveActuator();
+						$device->setId((String) $logicalDevice->Id);
+						$device->setName((String) $logicalDevice['Name']);
+						$device->setLocationId((String) $logicalDevice['LCID']);
+						if(array_key_exists($device->getLocationId(), $this->locations))
+							$device->setLocation($this->locations[$device->getLocationId()]);
+						$device->setBaseDeviceId((String) $logicalDevice->BDId);
+						$device->setActuatorClass((String) $logicalDevice->ActCls);
+						$device->setValveIndex((Integer) $logicalDevice->ValveIndex);						
+						
+						$this->logicalDevices[(String) $logicalDevice->Id] = $device;
+						break;
+												
 					case LogicalDevice::DEVICE_TYPE_ROOM_TEMPERATURE_ACTUATOR:
+						$device = new RoomTemperatureActuator();
+						$device->setId((String) $logicalDevice->Id);
+						$device->setName((String) $logicalDevice['Name']);
+						$device->setLocationId((String) $logicalDevice['LCID']);
+						if(array_key_exists($device->getLocationId(), $this->locations))
+							$device->setLocation($this->locations[$device->getLocationId()]);
+						$device->setBaseDeviceId((String) $logicalDevice->BDId);
+						$device->setActuatorClass((String) $logicalDevice->ActCls);
+						$device->setMaxTemperature((Float) $logicalDevice->MxTp);
+						$device->setMinTemperature((Float) $logicalDevice->MnTp);
+						$device->setPreheatFactor((Float) $logicalDevice->PhFct);
+						$device->setIsLocked((String) $logicalDevice->Lckd == 'false' ? false:true);
+						$device->setIsFreezeProtectionActivated((String) $logicalDevice->FPrA == 'false' ? false:true);
+						$device->setFreezeProtection((Float) $logicalDevice->FPr);
+						$device->setIsMoldProtectionActivated((String) $logicalDevice->MPrA == 'false' ? false:true);
+						$device->setHumidityMoldProtection((Float) $logicalDevice->HMPr);
+						$device->setWindowOpenTemperature((Float) $logicalDevice->WOpTp);
+						
+						$this->logicalDevices[(String) $logicalDevice->Id] = $device;
+						break;
+						
 					case LogicalDevice::DEVICE_TYPE_TEMPERATURE_SENSOR:
 					case LogicalDevice::DEVICE_TYPE_ROOM_TEMPERATURE_SENSOR:
 					case LogicalDevice::DEVICE_TYPE_HUMIDITY_SENSOR:
@@ -254,10 +316,12 @@ class SmartHome
 							$device->setState(WindowDoorSensor::WINDOW_DOOR_SENSOR_STATE_CLOSED);
 						else 
 							throw new \Exception('Unknown WindowDoorSensor state "'.(String) $state->IsOpen.'"');
-						debug($device, "WINDOW");
 						break;
 				
 					case LogicalDevice::DEVICE_TYPE_PUSH_BUTTON_SENSOR:
+						// has no state
+						break;
+						
 					case LogicalDevice::DEVICE_TYPE_THERMOSTAT_ACTUATOR:
 					case LogicalDevice::DEVICE_TYPE_VALVE_ACTUATOR:
 					case LogicalDevice::DEVICE_TYPE_ROOM_TEMPERATURE_ACTUATOR:
