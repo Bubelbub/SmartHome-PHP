@@ -401,6 +401,10 @@ class SmartHome
 						$this->logicalDevices[(String) $logicalDevice->Id] = $device;
 						break;
 						
+					case LogicalDevice::DEVICE_TYPE_DIMMER_ACTUATOR:
+					case LogicalDevice::DEVICE_TYPE_ROLLER_SHUTTER_ACTUATOR:
+						break;
+						
 					default:
 						throw new \Exception('Unknown LogicalDevice type: '.$logicalDevice->attributes('xsi', true)->type);
 				}
@@ -502,18 +506,30 @@ class SmartHome
 						// has no state
 						break;
 						
+					case LogicalDevice::DEVICE_TYPE_GENERIC_ACTUATOR:
+						// TODO Generic actuator state
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_GENERIC_SENSOR:
+						// TODO Generic sensor state
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_DIMMER_ACTUATOR:
+						// TODO Dimmer actuator state
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_ROLLER_SHUTTER_ACTUATOR:
+						// TODO Roller shutter actuator state
+						break;
+						
 					case LogicalDevice::DEVICE_TYPE_THERMOSTAT_ACTUATOR:
 					case LogicalDevice::DEVICE_TYPE_VALVE_ACTUATOR:
 					case LogicalDevice::DEVICE_TYPE_TEMPERATURE_SENSOR:
 					case LogicalDevice::DEVICE_TYPE_HUMIDITY_SENSOR:
 					case LogicalDevice::DEVICE_TYPE_MOTION_DETECTION_SENSOR:
-					case LogicalDevice::DEVICE_TYPE_GENERIC_ACTUATOR:
-					case LogicalDevice::DEVICE_TYPE_GENERIC_SENSOR:
-						// TO BE DONE...
-						break;
 				
 					default:
-						throw new \Exception('Unknown LogicalDevice type: '.$logicalDevice->attributes('xsi', true)->type);
+						throw new \Exception('Unknown LogicalDevice type: '.$device->getType());
 				}
 			}
 		}

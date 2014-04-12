@@ -25,6 +25,9 @@ class LogicalDevice {
 	const DEVICE_TYPE_SMOKE_DETECTOR_SENSOR = 'SmokeDetectorSensor';
 	const DEVICE_TYPE_GENERIC_ACTUATOR = 'GenericActuator';
 	const DEVICE_TYPE_GENERIC_SENSOR = 'GenericSensor';
+	const DEVICE_TYPE_DIMMER_ACTUATOR = 'DimmerActuator';
+	const DEVICE_TYPE_ROLLER_SHUTTER_ACTUATOR = 'RollerShutterActuator';
+	
 	
 	/**
 	 * @var string the ID
