@@ -9,7 +9,7 @@ use Bubelbub\SmartHomePHP\Entity\LogicalDevice;
  */
 class PushButtonSensor extends LogicalDevice {
 	
-	private $buttonCount = NULL;
+	protected $buttonCount = NULL;
 	
 	/**
 	 */

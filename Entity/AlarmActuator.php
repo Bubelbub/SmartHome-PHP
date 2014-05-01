@@ -18,12 +18,12 @@ class AlarmActuator extends Actuator {
 	/**
 	 * @var String
 	 */
-	private $state = NULL;
+	protected $state = NULL;
 		
 	/**
 	 * @var integer
 	 */
-	private $alarmDuration = NULL;
+	protected $alarmDuration = NULL;
 	
 	/**
 	 * constructor

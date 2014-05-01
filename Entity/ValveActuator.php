@@ -11,7 +11,7 @@ class ValveActuator extends Actuator {
 	/**
 	 * @var Integer
 	 */
-	private $valveIndex = NULL;
+	protected $valveIndex = NULL;
 	
 	/**
 	 */

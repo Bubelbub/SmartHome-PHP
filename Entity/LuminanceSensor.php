@@ -14,7 +14,7 @@ class LuminanceSensor extends LogicalDevice {
 	/**
 	 * @var integer
 	 */
-	private $luminance = NULL;
+	protected $luminance = NULL;
 	
 	/**
 	 */

@@ -11,12 +11,12 @@ use Bubelbub\SmartHomePHP\Entity\LogicalDevice;
  */
 class RoomHumiditySensor extends LogicalDevice {
 	
-	private $underlyingDeviceIds = array();
+	protected $underlyingDeviceIds = array();
 	
 	/**
 	 * @var float
 	 */
-	private $humidity = NULL;
+	protected $humidity = NULL;
 	
 	/**
 	 */

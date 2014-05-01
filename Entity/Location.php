@@ -96,6 +96,7 @@ class Location {
 	function __toString() {
 		return $this->name;
 	}
+	
 }
 
 ?>

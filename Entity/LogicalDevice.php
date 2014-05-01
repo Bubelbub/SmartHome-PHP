@@ -7,7 +7,7 @@ namespace Bubelbub\SmartHomePHP\Entity;
  * @author Ollie
  *
  */
-class LogicalDevice {
+class LogicalDevice extends Entity {
 	
 	const DEVICE_TYPE_SWITCH_ACTUATOR = 'SwitchActuator';
 	const DEVICE_TYPE_WINDOW_DOOR_SENSOR = 'WindowDoorSensor';
@@ -32,32 +32,32 @@ class LogicalDevice {
 	/**
 	 * @var string the ID
 	 */
-	private $id;
+	protected $id;
 	
 	/**
 	 * @var string Name
 	 */
-	private $name;
+	protected $name;
 	
 	/**
 	 * @var string the location ID
 	 */
-	private $locationId;
+	protected $locationId;
 	
 	/**
 	 * @var Location the location object
 	 */
-	private $location = NULL;
+	protected $location = NULL;
 	
 	/**
 	 * @var string ID of the baseDevice
 	 */
-	private $baseDeviceId;
+	protected $baseDeviceId;
 	
 	/**
 	 * @var string devicetype
 	 */
-	private $type;
+	protected $type;
 	
 	/**
 	 * Returns the ID

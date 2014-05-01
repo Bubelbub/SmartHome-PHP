@@ -14,7 +14,7 @@ class SwitchActuator extends Actuator {
 	/**
 	 * @var String
 	 */
-	private $state = NULL;
+	protected $state = NULL;
 	
 	/**
 	 * constructor 

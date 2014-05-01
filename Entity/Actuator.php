@@ -13,7 +13,7 @@ class Actuator extends LogicalDevice {
 	/**
 	 * @var string class of the actuator
 	 */
-	private $actuatorClass;
+	protected $actuatorClass;
 	
 	/**
 	 * Returns the actuator class

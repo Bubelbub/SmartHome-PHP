@@ -14,12 +14,12 @@ class RoomTemperatureSensor extends LogicalDevice {
 	/**
 	 * @var array
 	 */
-	private $underlyingDeviceIds = array();
+	protected $underlyingDeviceIds = array();
 	
 	/**
 	 * @var float
 	 */
-	private $temperature = NULL;
+	protected $temperature = NULL;
 	
 	/**
 	 */

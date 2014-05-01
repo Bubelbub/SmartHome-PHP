@@ -17,67 +17,67 @@ class RoomTemperatureActuator extends Actuator {
 	/**
 	 * @var float
 	 */
-	private $pointTemperature = NULL;
+	protected $pointTemperature = NULL;
 	
 	/**
 	 * @var string
 	 */
-	private $operationMode = NULL;
+	protected $operationMode = NULL;
 	
 	/**
 	 * @var boolean
 	 */
-	private $windowReductionMode = NULL;
+	protected $windowReductionMode = NULL;
 	
 	/**
 	 * @var array
 	 */
-	private $underlyingDeviceIds = array();
+	protected $underlyingDeviceIds = array();
 	
 	/**
 	 * @var float maximal temperature
 	 */
-	private $maxTemperature = NULL;
+	protected $maxTemperature = NULL;
 	
 	/**
 	 * @var float minimal temperature
 	 */
-	private $minTemperature = NULL;
+	protected $minTemperature = NULL;
 	
 	/**
 	 * @var float
 	 */
-	private $preheatFactor = NULL;
+	protected $preheatFactor = NULL;
 	
 	/**
 	 * @var boolean
 	 */
-	private $isLocked = NULL;
+	protected $isLocked = NULL;
 	
 	/**
 	 * @var boolean
 	 */
-	private $isFreezeProtectionActivated = NULL;
+	protected $isFreezeProtectionActivated = NULL;
 	
 	/**
 	 * @var float
 	 */
-	private $freezeProtection = NULL;
+	protected $freezeProtection = NULL;
 	
 	/**
 	 * @var boolean
 	 */
-	private $isMoldProtectionActivated = NULL;
+	protected $isMoldProtectionActivated = NULL;
 	
 	/**
 	 * @var float
 	 */
-	private $humidityMoldProtection = NULL;
+	protected $humidityMoldProtection = NULL;
 	
 	/**
 	 * @var float
 	 */
-	private $windowOpenTemperature = NULL;
+	protected $windowOpenTemperature = NULL;
 	
 	
 	

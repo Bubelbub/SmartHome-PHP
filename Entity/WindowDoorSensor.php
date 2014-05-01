@@ -17,12 +17,12 @@ class WindowDoorSensor extends LogicalDevice {
 	/**
 	 * @var String
 	 */
-	private $installationType;
+	protected $installationType;
 	
 	/**
 	 * @var String
 	 */
-	private $state = null;
+	protected $state = null;
 	
 	/**
 	 * Constructor

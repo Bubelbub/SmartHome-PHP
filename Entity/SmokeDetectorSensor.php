@@ -17,7 +17,7 @@ class SmokeDetectorSensor extends LogicalDevice {
 	/**
 	 * @var String
 	 */
-	private $state = NULL;
+	protected $state = NULL;
 	
 	/**
 	 */
