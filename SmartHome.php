@@ -20,6 +20,24 @@ use Bubelbub\SmartHomePHP\Request\GetShcTypeRequest;
 use Bubelbub\SmartHomePHP\Request\LoginRequest;
 use Bubelbub\SmartHomePHP\Request\ReleaseConfigurationLockRequest;
 use Bubelbub\SmartHomePHP\Request\SetActuatorStatesRequest;
+use Bubelbub\SmartHomePHP\Entity\Location;
+use Bubelbub\SmartHomePHP\Entity\SwitchActuator;
+use Bubelbub\SmartHomePHP\Entity\LogicalDevice;
+use Bubelbub\SmartHomePHP\Entity\WindowDoorSensor;
+use Bubelbub\SmartHomePHP\Entity\PushButtonSensor;
+use Bubelbub\SmartHomePHP\Entity\ThermostatActuator;
+use Bubelbub\SmartHomePHP\Entity\ValveActuator;
+use Bubelbub\SmartHomePHP\Entity\RoomTemperatureActuator;
+use Bubelbub\SmartHomePHP\Entity\TemperatureSensor;
+use Bubelbub\SmartHomePHP\Entity\RoomTemperatureSensor;
+use Bubelbub\SmartHomePHP\Entity\HumiditySensor;
+use Bubelbub\SmartHomePHP\Entity\RoomHumiditySensor;
+use Bubelbub\SmartHomePHP\Entity\MotionDetectionSensor;
+use Bubelbub\SmartHomePHP\Entity\LuminanceSensor;
+use Bubelbub\SmartHomePHP\Entity\AlarmActuator;
+use Bubelbub\SmartHomePHP\Entity\SmokeDetectorSensor;
+use Bubelbub\SmartHomePHP\Entity\GenericActuator;
+use Bubelbub\SmartHomePHP\Entity\GenericSensor;
 
 /**
  * Class SmartHome
@@ -57,12 +75,22 @@ class SmartHome
 	 * @var string the version of shc
 	 */
 	private $version;
+	
+	/**
+	 * @var array array of all locations
+	 */
+	private $locations = null;
+	
+	/**
+	 * @var array array of all logicalDevices
+	 */
+	private $logicalDevices = null;
 
 	/**
 	 * @var string the configuration version of entities etc.
 	 */
 	private $configVersion;
-
+	
 	/**
 	 * @param string $host the hostname/ip address of the shc
 	 * @param string $username the username of shc user/owner
@@ -131,9 +159,261 @@ class SmartHome
 	{
 		$getEntitiesRequest = new GetEntitiesRequest($this);
 		$getEntitiesRequest->setEntityType($entityType);
-		return $getEntitiesRequest->send();
+		$response =  $getEntitiesRequest->send();
+		
+		// create all Location objects
+		if ($entityType == 'Configuration' or $entityType == 'Locations') {
+			foreach ($response->LCs->LC as $location) {
+				$this->locations[(String) $location->Id] = 
+					new Location(
+						(String) $location->Id, 
+						(String) $location->Name, 
+						(String) $location->Position
+					);
+			}
+		}
+		
+		// create all LogicalDevice objects
+		if($entityType == 'Configuration' or $entityType == 'LogicalDevices') {
+			foreach ($response->LDs->LD as $logicalDevice) {
+				switch ($logicalDevice->attributes('xsi', true)->type) {
+					case LogicalDevice::DEVICE_TYPE_SWITCH_ACTUATOR:
+						$device = new SwitchActuator();
+						$device->setId((String) $logicalDevice->Id);
+						$device->setName((String) $logicalDevice['Name']);
+						$device->setLocationId((String) $logicalDevice['LCID']);
+						if(array_key_exists($device->getLocationId(), $this->locations))
+							$device->setLocation($this->locations[$device->getLocationId()]);
+						$device->setBaseDeviceId((String) $logicalDevice->BDId);
+						$device->setActuatorClass((String) $logicalDevice->ActCls);
+						
+						$this->logicalDevices[(String) $logicalDevice->Id] = $device;
+						break;
+					
+					case LogicalDevice::DEVICE_TYPE_WINDOW_DOOR_SENSOR:
+						$device = new WindowDoorSensor();
+						$device->setId((String) $logicalDevice->Id);
+						$device->setName((String) $logicalDevice['Name']);
+						$device->setLocationId((String) $logicalDevice['LCID']);
+						if(array_key_exists($device->getLocationId(), $this->locations))
+							$device->setLocation($this->locations[$device->getLocationId()]);
+						$device->setBaseDeviceId((String) $logicalDevice->BDId);
+						$device->setInstallationType((String) $logicalDevice->Installation);
+						
+						$this->logicalDevices[(String) $logicalDevice->Id] = $device;
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_PUSH_BUTTON_SENSOR:
+						$device = new PushButtonSensor();
+						$device->setId((String) $logicalDevice->Id);
+						$device->setName((String) $logicalDevice['Name']);
+						$device->setLocationId((String) $logicalDevice['LCID']);
+						if(array_key_exists($device->getLocationId(), $this->locations))
+							$device->setLocation($this->locations[$device->getLocationId()]);
+						$device->setBaseDeviceId((String) $logicalDevice->BDId);
+						$device->setButtonCount((Integer) $logicalDevice->ButtonCount);
+						
+						$this->logicalDevices[(String) $logicalDevice->Id] = $device;
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_THERMOSTAT_ACTUATOR:
+						$device = new ThermostatActuator();
+						$device->setId((String) $logicalDevice->Id);
+						$device->setName((String) $logicalDevice['Name']);
+						$device->setLocationId((String) $logicalDevice['LCID']);
+						if(array_key_exists($device->getLocationId(), $this->locations))
+							$device->setLocation($this->locations[$device->getLocationId()]);
+						$device->setBaseDeviceId((String) $logicalDevice->BDId);
+						$device->setActuatorClass((String) $logicalDevice->ActCls);						
+						
+						$this->logicalDevices[(String) $logicalDevice->Id] = $device;
+						break;
+												
+					case LogicalDevice::DEVICE_TYPE_VALVE_ACTUATOR:
+						$device = new ValveActuator();
+						$device->setId((String) $logicalDevice->Id);
+						$device->setName((String) $logicalDevice['Name']);
+						$device->setLocationId((String) $logicalDevice['LCID']);
+						if(array_key_exists($device->getLocationId(), $this->locations))
+							$device->setLocation($this->locations[$device->getLocationId()]);
+						$device->setBaseDeviceId((String) $logicalDevice->BDId);
+						$device->setActuatorClass((String) $logicalDevice->ActCls);
+						$device->setValveIndex((Integer) $logicalDevice->ValveIndex);						
+						
+						$this->logicalDevices[(String) $logicalDevice->Id] = $device;
+						break;
+												
+					case LogicalDevice::DEVICE_TYPE_ROOM_TEMPERATURE_ACTUATOR:
+						$device = new RoomTemperatureActuator();
+						$device->setId((String) $logicalDevice->Id);
+						$device->setName((String) $logicalDevice['Name']);
+						$device->setLocationId((String) $logicalDevice['LCID']);
+						if(array_key_exists($device->getLocationId(), $this->locations))
+							$device->setLocation($this->locations[$device->getLocationId()]);
+						$guids = array();
+						foreach ($logicalDevice->UDvIds->guid as $guid) {
+							$guids[] = (String) $guid[0];
+						}
+						$device->setUnderlyingDeviceIds($guids);
+						$device->setBaseDeviceId((String) $logicalDevice->BDId);
+						$device->setActuatorClass((String) $logicalDevice->ActCls);
+						$device->setMaxTemperature((Float) $logicalDevice->MxTp);
+						$device->setMinTemperature((Float) $logicalDevice->MnTp);
+						$device->setPreheatFactor((Float) $logicalDevice->PhFct);
+						$device->setIsLocked((String) $logicalDevice->Lckd == 'false' ? false:true);
+						$device->setIsFreezeProtectionActivated((String) $logicalDevice->FPrA == 'false' ? false:true);
+						$device->setFreezeProtection((Float) $logicalDevice->FPr);
+						$device->setIsMoldProtectionActivated((String) $logicalDevice->MPrA == 'false' ? false:true);
+						$device->setHumidityMoldProtection((Float) $logicalDevice->HMPr);
+						$device->setWindowOpenTemperature((Float) $logicalDevice->WOpTp);
+						
+						$this->logicalDevices[(String) $logicalDevice->Id] = $device;
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_TEMPERATURE_SENSOR:
+						$device = new TemperatureSensor();
+						$device->setId((String) $logicalDevice->Id);
+						$device->setName((String) $logicalDevice['Name']);
+						$device->setLocationId((String) $logicalDevice['LCID']);
+						if(array_key_exists($device->getLocationId(), $this->locations))
+							$device->setLocation($this->locations[$device->getLocationId()]);
+						$device->setBaseDeviceId((String) $logicalDevice->BDId);
+						
+						$this->logicalDevices[(String) $logicalDevice->Id] = $device;
+						break;
+												
+					case LogicalDevice::DEVICE_TYPE_ROOM_TEMPERATURE_SENSOR:
+						$device = new RoomTemperatureSensor();
+						$device->setId((String) $logicalDevice->Id);
+						$device->setName((String) $logicalDevice['Name']);
+						$device->setLocationId((String) $logicalDevice['LCID']);
+						if(array_key_exists($device->getLocationId(), $this->locations))
+							$device->setLocation($this->locations[$device->getLocationId()]);
+						$guids = array();
+						foreach ($logicalDevice->UDvIds->guid as $guid) {
+							$guids[] = (String) $guid[0];
+						}
+						$device->setUnderlyingDeviceIds($guids);
+						
+						$this->logicalDevices[(String) $logicalDevice->Id] = $device;
+						break;
+												
+					case LogicalDevice::DEVICE_TYPE_HUMIDITY_SENSOR:
+						$device = new HumiditySensor();
+						$device->setId((String) $logicalDevice->Id);
+						$device->setName((String) $logicalDevice['Name']);
+						$device->setLocationId((String) $logicalDevice['LCID']);
+						if(array_key_exists($device->getLocationId(), $this->locations))
+							$device->setLocation($this->locations[$device->getLocationId()]);
+						$device->setBaseDeviceId((String) $logicalDevice->BDId);
+						
+						$this->logicalDevices[(String) $logicalDevice->Id] = $device;
+						break;
+												
+					case LogicalDevice::DEVICE_TYPE_ROOM_HUMIDITY_SENSOR:
+						$device = new RoomHumiditySensor();
+						$device->setId((String) $logicalDevice->Id);
+						$device->setName((String) $logicalDevice['Name']);
+						$device->setLocationId((String) $logicalDevice['LCID']);
+						if(array_key_exists($device->getLocationId(), $this->locations))
+							$device->setLocation($this->locations[$device->getLocationId()]);
+						$guids = array();
+						foreach ($logicalDevice->UDvIds->guid as $guid) {
+							$guids[] = (String) $guid[0];
+						}
+						$device->setUnderlyingDeviceIds($guids);
+												
+						$this->logicalDevices[(String) $logicalDevice->Id] = $device;
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_MOTION_DETECTION_SENSOR:
+						$device = new MotionDetectionSensor();
+						$device->setId((String) $logicalDevice->Id);
+						$device->setName((String) $logicalDevice['Name']);
+						$device->setLocationId((String) $logicalDevice['LCID']);
+						if(array_key_exists($device->getLocationId(), $this->locations))
+							$device->setLocation($this->locations[$device->getLocationId()]);
+						$device->setBaseDeviceId((String) $logicalDevice->BDId);
+						
+						$this->logicalDevices[(String) $logicalDevice->Id] = $device;
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_LUMINANCE_SENSOR:
+						$device = new LuminanceSensor();
+						$device->setId((String) $logicalDevice->Id);
+						$device->setName((String) $logicalDevice['Name']);
+						$device->setLocationId((String) $logicalDevice['LCID']);
+						if(array_key_exists($device->getLocationId(), $this->locations))
+							$device->setLocation($this->locations[$device->getLocationId()]);
+						$device->setBaseDeviceId((String) $logicalDevice->BDId);
+						
+						$this->logicalDevices[(String) $logicalDevice->Id] = $device;
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_ALARM_ACTUATOR:
+						$device = new AlarmActuator();
+						$device->setId((String) $logicalDevice->Id);
+						$device->setName((String) $logicalDevice['Name']);
+						$device->setLocationId((String) $logicalDevice['LCID']);
+						if(array_key_exists($device->getLocationId(), $this->locations))
+							$device->setLocation($this->locations[$device->getLocationId()]);
+						$device->setBaseDeviceId((String) $logicalDevice->BDId);
+						$device->setActuatorClass((String) $logicalDevice->ActCls);
+						$device->setAlarmDuration((Integer) $logicalDevice->DOfStgs->AlarmDuration);
+						
+						$this->logicalDevices[(String) $logicalDevice->Id] = $device;
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_SMOKE_DETECTOR_SENSOR:
+						$device = new SmokeDetectorSensor();
+						$device->setId((String) $logicalDevice->Id);
+						$device->setName((String) $logicalDevice['Name']);
+						$device->setLocationId((String) $logicalDevice['LCID']);
+						if(array_key_exists($device->getLocationId(), $this->locations))
+							$device->setLocation($this->locations[$device->getLocationId()]);
+						$device->setBaseDeviceId((String) $logicalDevice->BDId);
+						
+						$this->logicalDevices[(String) $logicalDevice->Id] = $device;
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_GENERIC_ACTUATOR:
+						$device = new GenericActuator();
+						$device->setId((String) $logicalDevice->Id);
+						$device->setName((String) $logicalDevice['Name']);
+						$device->setLocationId((String) $logicalDevice['LCID']);
+						if(array_key_exists($device->getLocationId(), $this->locations))
+							$device->setLocation($this->locations[$device->getLocationId()]);
+						$device->setBaseDeviceId((String) $logicalDevice->BDId);
+						$device->setActuatorClass((String) $logicalDevice->ActCls);
+					
+						$this->logicalDevices[(String) $logicalDevice->Id] = $device;
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_GENERIC_SENSOR:
+						$device = new GenericSensor();
+						$device->setId((String) $logicalDevice->Id);
+						$device->setName((String) $logicalDevice['Name']);
+						$device->setLocationId((String) $logicalDevice['LCID']);
+						if(array_key_exists($device->getLocationId(), $this->locations))
+							$device->setLocation($this->locations[$device->getLocationId()]);
+						$device->setBaseDeviceId((String) $logicalDevice->BDId);
+						
+						$this->logicalDevices[(String) $logicalDevice->Id] = $device;
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_DIMMER_ACTUATOR:
+					case LogicalDevice::DEVICE_TYPE_ROLLER_SHUTTER_ACTUATOR:
+						break;
+						
+					default:
+						throw new \Exception('Unknown LogicalDevice type: '.$logicalDevice->attributes('xsi', true)->type);
+				}
+			}
+		}
+		
+		return $response;
 	}
-
+	
 	/**
 	 * @return \SimpleXMLElement
 	 */
@@ -149,7 +429,112 @@ class SmartHome
 	public function getAllLogicalDeviceStates()
 	{
 		$getAllLogicalDeviceStatesRequest = new GetAllLogicalDeviceStatesRequest($this);
-		return $getAllLogicalDeviceStatesRequest->send();
+		$response = $getAllLogicalDeviceStatesRequest->send();
+		
+		// update LogicalDevice states
+		foreach ($response->States->LogicalDeviceState as $state) {
+			$device = &$this->logicalDevices[(String) $state['LID']];
+
+			if(is_object($device)) {
+				switch ($device->getType()) {
+					case LogicalDevice::DEVICE_TYPE_SWITCH_ACTUATOR:
+						if((String) $state['IsOn'] == 'True')
+							$device->setState(SwitchActuator::SWITCH_ACTUATOR_STATE_ON);
+						elseif((String) $state['IsOn'] == 'False')
+							$device->setState(SwitchActuator::SWITCH_ACTUATOR_STATE_OFF);
+						else
+							throw new \Exception('Unknown SwitchActuator state "'.(String) $state['IsOn'].'"');
+						break;
+							
+					case LogicalDevice::DEVICE_TYPE_ALARM_ACTUATOR:
+						if((String) $state->IsOn == 'true')
+							$device->setState(AlarmActuator::ALARM_ACTUATOR_STATE_ON);
+						elseif((String) $state->IsOn == 'false')
+							$device->setState(AlarmActuator::ALARM_ACTUATOR_STATE_OFF);
+						else
+							throw new \Exception('Unknown AlarmActuator state "'.(String) $state->IsOn.'"');
+						break;
+							
+					case LogicalDevice::DEVICE_TYPE_WINDOW_DOOR_SENSOR:
+						if((String) $state->IsOpen == 'true')
+							$device->setState(WindowDoorSensor::WINDOW_DOOR_SENSOR_STATE_OPEN);
+						elseif((String) $state->IsOpen == 'false')
+							$device->setState(WindowDoorSensor::WINDOW_DOOR_SENSOR_STATE_CLOSED);
+						else 
+							throw new \Exception('Unknown WindowDoorSensor state "'.(String) $state->IsOpen.'"');
+						break;
+				
+					case LogicalDevice::DEVICE_TYPE_SMOKE_DETECTOR_SENSOR:
+						if((String) $state->IsSmokeAlarm == 'true')
+							$device->setState(SmokeDetectorSensor::SMOKE_DETECTOR_STATE_SMOKE_ALARM_ON);
+						elseif((String) $state->IsSmokeAlarm == 'false')
+							$device->setState(SmokeDetectorSensor::SMOKE_DETECTOR_STATE_SMOKE_ALARM_OFF);
+						else
+							throw new \Exception('Unknown SmokeDetectorSensor state "'.(String) $state->IsSmokeAlarm.'"');
+						break;
+							
+					case LogicalDevice::DEVICE_TYPE_ROOM_TEMPERATURE_ACTUATOR:
+						$device->setPointTemperature((float) $state['PtTmp']);
+						if((String) $state['OpnMd'] == 'Auto')
+							$device->setOperationMode(RoomTemperatureActuator::ROOM_TEMPERATURE_ACTUATOR_MODE_AUTO);
+						elseif((String) $state['OpnMd'] == 'Manu')
+							$device->setOperationMode(RoomTemperatureActuator::ROOM_TEMPERATURE_ACTUATOR_MODE_MANUAL);
+						else
+							throw new \Exception('Unknown RoomTemperatureActuator state "'.(String) $state['OpnMd'].'"');
+						
+						if((String) $state['WRAc'] == 'False')
+							$device->setWindowReductionMode(RoomTemperatureActuator::ROOM_TEMPERATURE_ACTUATOR_WINDOW_REDUCTION_INACTIVE);
+						elseif((String) $state['WRAc'] == 'True')
+							$device->setWindowReductionMode(RoomTemperatureActuator::ROOM_TEMPERATURE_ACTUATOR_WINDOW_REDUCTION_ACTIVE);
+						else
+							throw new \Exception('Unknown RoomTemperatureActuator mode "'.(String) $state['WRAc'].'"');
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_ROOM_TEMPERATURE_SENSOR:
+						$device->setTemperature((float) $state['Temperature']);
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_ROOM_HUMIDITY_SENSOR:
+						$device->setHumidity((float) $state['Humidity']);
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_LUMINANCE_SENSOR:
+						$device->setLuminance((integer) $state['Luminance']);
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_PUSH_BUTTON_SENSOR:
+						// has no state
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_GENERIC_ACTUATOR:
+						// TODO Generic actuator state
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_GENERIC_SENSOR:
+						// TODO Generic sensor state
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_DIMMER_ACTUATOR:
+						// TODO Dimmer actuator state
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_ROLLER_SHUTTER_ACTUATOR:
+						// TODO Roller shutter actuator state
+						break;
+						
+					case LogicalDevice::DEVICE_TYPE_THERMOSTAT_ACTUATOR:
+					case LogicalDevice::DEVICE_TYPE_VALVE_ACTUATOR:
+					case LogicalDevice::DEVICE_TYPE_TEMPERATURE_SENSOR:
+					case LogicalDevice::DEVICE_TYPE_HUMIDITY_SENSOR:
+					case LogicalDevice::DEVICE_TYPE_MOTION_DETECTION_SENSOR:
+				
+					default:
+						throw new \Exception('Unknown LogicalDevice type: '.$device->getType());
+				}
+			}
+		}
+		
+		return $response;
 	}
 
 	/**
@@ -219,6 +604,34 @@ class SmartHome
 	}
 
 	/**
+	 * Set the state of an logical device
+	 *
+	 * @param string $logicalDeviceId the logical device id
+	 * @param boolean $on the new state of the device (true = on, false = off)
+	 * @return \SimpleXMLElement
+	 */
+	function setLogicalDeviceState($logicalDeviceId, $on)
+	{
+		$setActuatorStatesRequest = new SetActuatorStatesRequest($this);
+		$setActuatorStatesRequest->addLogicalDeviceState($logicalDeviceId, $on);
+		return $setActuatorStatesRequest->send();
+	}
+
+	/**
+	 * Set the state of an adapter for example
+	 *
+	 * @param string $logicalDeviceId the logical device id
+	 * @param boolean $on the new state of the device (true = on, false = off)
+	 * @return \SimpleXMLElement
+	 */
+	function setSwitchActuatorState($logicalDeviceId, $on)
+	{
+		$setActuatorStatesRequest = new SetActuatorStatesRequest($this);
+		$setActuatorStatesRequest->addSwitchActuatorState($logicalDeviceId, $on);
+		return $setActuatorStatesRequest->send();
+	}
+
+	/**
 	 * @param bool $overrideLock
 	 * @return \SimpleXMLElement
 	 */
@@ -236,6 +649,29 @@ class SmartHome
 	{
 		$releaseConfigurationLockRequest = new ReleaseConfigurationLockRequest($this);
 		return $releaseConfigurationLockRequest->send();
+	}
+	
+	/**
+	 * Returns an array of all locations
+	 * 
+	 * @return array
+	 */
+	function getLocations() {
+		return $this->locations;
+	}
+	
+	/**
+	 * Returns the location with the given id
+	 * 
+	 * @param string $id
+	 * @return array
+	 */
+	function getLocation($id) {
+		return $this->locations[$id];
+	}
+	
+	function setLocations($locations) {
+		$this->locations = $locations;
 	}
 
 	/**
@@ -328,5 +764,20 @@ class SmartHome
 	public function setConfigVersion($configVersion = null)
 	{
 		$this->configVersion = $configVersion;
+	}
+	
+	/**
+	 * Returns an array of all LogicalDevices
+	 * @return array
+	 */
+	public function getLogicalDevices() {
+		return $this->logicalDevices;
+	}
+	
+	/**
+	 * @param array $logicalDevices
+	 */
+	public function setLogicalDevices($logicalDevices) {
+		$this->logicalDevices = $logicalDevices;
 	}
 }

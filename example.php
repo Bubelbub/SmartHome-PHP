@@ -7,18 +7,40 @@
  * Time: 15:44
  */
 
+use Bubelbub\SmartHomePHP\SmartHome;
+use Bubelbub\SmartHomePHP\Entity\LogicalDevice;
 require_once 'SmartHome.php';
 require_once 'Request/BaseRequest.php';
 require_once 'Request/LoginRequest.php';
-require_once 'Request/GetEntitiesRequest.php';
-require_once 'Request/GetShcInformationRequest.php';
 require_once 'Request/GetAllLogicalDeviceStatesRequest.php';
-require_once 'Request/GetApplicationTokenRequest.php';
-require_once 'Request/GetShcTypeRequest.php';
-require_once 'Request/GetAllPhysicalDeviceStatesRequest.php';
 require_once 'Request/GetMessageListRequest.php';
-
-use \Bubelbub\SmartHomePHP\Request\SetActuatorStatesRequest;
+require_once 'Request/GetEntitiesRequest.php';
+require_once 'Request/GetAllPhysicalDeviceStatesRequest.php';
+require_once 'Request/GetShcInformationRequest.php';
+require_once 'Request/GetShcTypeRequest.php';
+require_once 'Request/GetApplicationTokenRequest.php';
+require_once 'Entity/Entity.php';
+require_once 'Entity/Location.php';
+require_once 'Entity/LogicalDevice.php';
+require_once 'Entity/Actuator.php';
+require_once 'Entity/SwitchActuator.php';
+require_once 'Entity/WindowDoorSensor.php';
+require_once 'Entity/PushButtonSensor.php';
+require_once 'Entity/ThermostatActuator.php';
+require_once 'Entity/ValveActuator.php';
+require_once 'Entity/RoomTemperatureActuator.php';
+require_once 'Log.php';
+require_once 'Request/SetActuatorStatesRequest.php';
+require_once 'Entity/TemperatureSensor.php';
+require_once 'Entity/RoomTemperatureSensor.php';
+require_once 'Entity/HumiditySensor.php';
+require_once 'Entity/RoomHumiditySensor.php';
+require_once 'Entity/MotionDetectionSensor.php';
+require_once 'Entity/LuminanceSensor.php';
+require_once 'Entity/AlarmActuator.php';
+require_once 'Entity/SmokeDetectorSensor.php';
+require_once 'Entity/GenericActuator.php';
+require_once 'Entity/GenericSensor.php';
 
 $newLine = php_sapi_name() == 'cli' ? PHP_EOL : '<br />';
 
@@ -52,11 +74,31 @@ echo 'Your current version is ' . $sh->getVersion() . $newLine;
 // get your current configuration version
 echo 'Your current configuration version is ' . $sh->getConfigVersion() . $newLine;
 
+// Load all entities (full configuration: LogicalDevices, Locations etc.)
+echo 'Loading full configuration...' . $newLine;
+$sh->getEntities();
+
+// Load only locations
+// $sh->getEntities('Locations');
+
 // Get all logical devices states
-print_r($sh->getAllLogicalDeviceStates());
+echo 'Loading logical device states' . $newLine;
+$sh->getAllLogicalDeviceStates();
+
+// Now get a list of all LogicalDevices and print their names and room
+foreach ($sh->getLogicalDevices() as $ld) {
+	printf("Device '%s' is a '%s' in room '%s'.", $ld->getName(), $ld->getType(), $ld->getLocation()->getName());
+	if($ld->getType() == LogicalDevice::DEVICE_TYPE_SWITCH_ACTUATOR) {
+		printf(" Switch state is '%s'.", $ld->getState());
+	}
+	if($ld->getType() == LogicalDevice::DEVICE_TYPE_WINDOW_DOOR_SENSOR) {
+		printf(" %s is %s.", $ld->getInstallationType(), $ld->getState());
+	}
+	echo $newLine;
+}
 
 // Get all messages
-print_r($sh->getMessageList());
+//print_r($sh->getMessageList());
 
 // Set room temperature of heater to 18°C
 /*
