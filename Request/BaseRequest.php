@@ -34,6 +34,11 @@ abstract class BaseRequest
 	private $response;
 
 	/**
+	 * @var array
+	 */
+	private $responseHeader;
+
+	/**
 	 * @var string the action (cmd|upd)
 	 */
 	protected $action = 'cmd';
@@ -69,14 +74,25 @@ abstract class BaseRequest
 
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, 'https://' . $this->smartHome->getHost() . '/' . $this->action);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		if(($clientId = $this->smartHome->getClientId()) !== null || $this->action === 'upd')
+		{
+			if($clientId === null && $this->action === 'upd')
+			{
+				throw new \Exception('Unable to get updates if no client id is specified!', 107);
+			}
+			curl_setopt($ch, CURLOPT_HTTPHEADER, array('ClientId: ' . $clientId));
+		}
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_POST, true);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+		curl_setopt($ch, CURLOPT_HEADER, true);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 		curl_setopt($ch, CURLOPT_SSLVERSION, 3);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $this->request->asXML());
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $this->action === 'upd' ? 'upd' : $this->request->asXML());
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-		$this->setResponse(curl_exec($ch));
+		list($header, $body) = explode("\r\n\r\n", curl_exec($ch), 2);
+		$this->setResponse($body);
+		$this->setResponseHeader($header);
 		curl_close($ch);
 
 		/**
@@ -145,5 +161,31 @@ abstract class BaseRequest
 		catch(\Exception $ex){}
 		$xml->registerXPathNamespace('xsi', 'http://www.w3.org/2001/XMLSchema-instance');
 		$this->response = $xml;
+	}
+
+	/**
+	 * @param string|array $responseHeader
+	 */
+	public function setResponseHeader($responseHeader)
+	{
+		if(is_string($responseHeader))
+		{
+			require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Utils' . DIRECTORY_SEPARATOR . 'HttpParseHeaders.php';
+			$responseHeader = http_parse_headers($responseHeader);
+		}
+		if(isset($responseHeader['ClientId']))
+		{
+			$this->smartHome->setClientId($responseHeader['ClientId']);
+		}
+		$this->responseHeader = $responseHeader;
+	}
+
+	/**
+	 * @param null|string|integer $key the key if needed
+	 * @return array|string the response header array or the needed value from key
+	 */
+	public function getResponseHeader($key = null)
+	{
+		return $key === null || !is_array($this->responseHeader) ? $this->responseHeader : $this->responseHeader[$key];
 	}
 }

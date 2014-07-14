@@ -9,6 +9,7 @@
 
 use Bubelbub\SmartHomePHP\SmartHome;
 use Bubelbub\SmartHomePHP\Entity\LogicalDevice;
+
 require_once 'SmartHome.php';
 require_once 'Request/BaseRequest.php';
 require_once 'Request/LoginRequest.php';
@@ -18,6 +19,7 @@ require_once 'Request/GetEntitiesRequest.php';
 require_once 'Request/GetAllPhysicalDeviceStatesRequest.php';
 require_once 'Request/GetShcInformationRequest.php';
 require_once 'Request/GetShcTypeRequest.php';
+require_once 'Request/GetUpdatesRequest.php';
 require_once 'Request/GetApplicationTokenRequest.php';
 require_once 'Entity/Entity.php';
 require_once 'Entity/Location.php';
@@ -29,7 +31,6 @@ require_once 'Entity/PushButtonSensor.php';
 require_once 'Entity/ThermostatActuator.php';
 require_once 'Entity/ValveActuator.php';
 require_once 'Entity/RoomTemperatureActuator.php';
-require_once 'Log.php';
 require_once 'Request/SetActuatorStatesRequest.php';
 require_once 'Entity/TemperatureSensor.php';
 require_once 'Entity/RoomTemperatureSensor.php';
@@ -56,17 +57,22 @@ $sh = new \Bubelbub\SmartHomePHP\SmartHome('Hostname or IP address', 'Username',
 if(!file_exists($configFile))
 {
 	$config->addChild('SessionId', $sh->getSessionId());
+	$config->addChild('ClientId', $sh->getClientId());
 	$config->addChild('Version', $sh->getVersion());
 	$config->addChild('ConfigurationVersion', $sh->getConfigVersion());
 	$config->saveXML($configFile);
 }
 
 $sh->setSessionId((string) $config->SessionId);
+$sh->setClientId((string) $config->ClientId);
 $sh->setVersion((string) $config->Version);
 $sh->setConfigVersion((string) $config->ConfigurationVersion);
 
 // get your current session id
 echo 'Your session id is ' . $sh->getSessionId() . $newLine;
+
+// get your current session id
+echo 'Your current client id is ' . $sh->getClientId() . $newLine;
 
 // get your current version
 echo 'Your current version is ' . $sh->getVersion() . $newLine;
@@ -96,6 +102,9 @@ foreach ($sh->getLogicalDevices() as $ld) {
 	}
 	echo $newLine;
 }
+
+// Get updates
+//print_r($sh->getUpdates());
 
 // Get all messages
 //print_r($sh->getMessageList());
