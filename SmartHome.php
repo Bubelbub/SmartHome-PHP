@@ -659,6 +659,10 @@ class SmartHome
 	 */
 	public function getLocations()
 	{
+		if(!is_array($this->locations) || count($this->locations) < 1)
+		{
+			$this->getEntities();
+		}
 		return $this->locations;
 	}
 
