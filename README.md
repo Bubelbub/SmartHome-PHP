@@ -3,6 +3,10 @@
 
 That's a library for SmartHomes. Written in PHP.
 
+## Supported SmartHomes ##
+
+- [RWE-SmartHome](http://www.rwe-smarthome.de)
+
 ## Installation (Normal way) ##
 
 1. Download GIT
