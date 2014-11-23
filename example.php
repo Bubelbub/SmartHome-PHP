@@ -10,38 +10,7 @@
 use Bubelbub\SmartHomePHP\SmartHome;
 use Bubelbub\SmartHomePHP\Entity\LogicalDevice;
 
-require_once 'SmartHome.php';
-require_once 'Request/BaseRequest.php';
-require_once 'Request/LoginRequest.php';
-require_once 'Request/GetAllLogicalDeviceStatesRequest.php';
-require_once 'Request/GetMessageListRequest.php';
-require_once 'Request/GetEntitiesRequest.php';
-require_once 'Request/GetAllPhysicalDeviceStatesRequest.php';
-require_once 'Request/GetShcInformationRequest.php';
-require_once 'Request/GetShcTypeRequest.php';
-require_once 'Request/GetUpdatesRequest.php';
-require_once 'Request/GetApplicationTokenRequest.php';
-require_once 'Entity/Entity.php';
-require_once 'Entity/Location.php';
-require_once 'Entity/LogicalDevice.php';
-require_once 'Entity/Actuator.php';
-require_once 'Entity/SwitchActuator.php';
-require_once 'Entity/WindowDoorSensor.php';
-require_once 'Entity/PushButtonSensor.php';
-require_once 'Entity/ThermostatActuator.php';
-require_once 'Entity/ValveActuator.php';
-require_once 'Entity/RoomTemperatureActuator.php';
-require_once 'Request/SetActuatorStatesRequest.php';
-require_once 'Entity/TemperatureSensor.php';
-require_once 'Entity/RoomTemperatureSensor.php';
-require_once 'Entity/HumiditySensor.php';
-require_once 'Entity/RoomHumiditySensor.php';
-require_once 'Entity/MotionDetectionSensor.php';
-require_once 'Entity/LuminanceSensor.php';
-require_once 'Entity/AlarmActuator.php';
-require_once 'Entity/SmokeDetectorSensor.php';
-require_once 'Entity/GenericActuator.php';
-require_once 'Entity/GenericSensor.php';
+require_once 'vendor/autoload.php';
 
 $newLine = php_sapi_name() == 'cli' ? PHP_EOL : '<br />';
 
@@ -52,7 +21,7 @@ if(file_exists($configFile))
 	try{$config = new SimpleXMLElement($configFile, 0, true);}catch(Exception $ex){}
 }
 
-$sh = new \Bubelbub\SmartHomePHP\SmartHome('Hostname or IP address', 'Username', 'Password');
+$sh = new SmartHome('Hostname or IP address', 'Username', 'Password');
 
 if(!file_exists($configFile))
 {

@@ -14,9 +14,6 @@
 			"email": "bubelbub@gmail.com"
 		}
 	],
-	"authors": [
-		{"name": "Bubelbub", "email": "bubelbub@gmail.com"}
-	],
 	"autoload": {
 		"psr-0": { "Bubelbub\\SmartHomePHP": "" }
 	},
