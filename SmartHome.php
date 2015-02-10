@@ -456,7 +456,7 @@ class SmartHome
 				switch ($device->getType())
 				{
 					case LogicalDevice::DEVICE_TYPE_SWITCH_ACTUATOR:
-						if ((String)$state['IsOn'] == 'True')
+						if (strcasecmp((String)$state['IsOn'],'true')==0)
 							$device->setState(SwitchActuator::SWITCH_ACTUATOR_STATE_ON);
 						elseif ((String)$state['IsOn'] == 'False')
 							$device->setState(SwitchActuator::SWITCH_ACTUATOR_STATE_OFF);
@@ -465,27 +465,27 @@ class SmartHome
 						break;
 
 					case LogicalDevice::DEVICE_TYPE_ALARM_ACTUATOR:
-						if ((String)$state->IsOn == 'true')
+						if (strcasecmp((String)$state->IsOn,'true')==0)
 							$device->setState(AlarmActuator::ALARM_ACTUATOR_STATE_ON);
-						elseif ((String)$state->IsOn == 'false')
+						elseif (strcasecmp((String)$state->IsOn,'false')==0)
 							$device->setState(AlarmActuator::ALARM_ACTUATOR_STATE_OFF);
 						else
 							throw new \Exception('Unknown AlarmActuator state "' . (String)$state->IsOn . '"', 104);
 						break;
 
 					case LogicalDevice::DEVICE_TYPE_WINDOW_DOOR_SENSOR:
-						if ((String)$state->IsOpen == 'true')
+						if (strcasecmp((String)$state->IsOpen,'true')==0)
 							$device->setState(WindowDoorSensor::WINDOW_DOOR_SENSOR_STATE_OPEN);
-						elseif ((String)$state->IsOpen == 'false')
+						elseif (strcasecmp((String)$state->IsOpen,'false')==0)
 							$device->setState(WindowDoorSensor::WINDOW_DOOR_SENSOR_STATE_CLOSED);
 						else
 							throw new \Exception('Unknown WindowDoorSensor state "' . (String)$state->IsOpen . '"', 104);
 						break;
 
 					case LogicalDevice::DEVICE_TYPE_SMOKE_DETECTOR_SENSOR:
-						if ((String)$state->IsSmokeAlarm == 'true')
+						if (strcasecmp((String)$state->IsSmokeAlarm,'true')==0)
 							$device->setState(SmokeDetectorSensor::SMOKE_DETECTOR_STATE_SMOKE_ALARM_ON);
-						elseif ((String)$state->IsSmokeAlarm == 'false')
+						elseif (strcasecmp((String)$state->IsSmokeAlarm,'false')==0)
 							$device->setState(SmokeDetectorSensor::SMOKE_DETECTOR_STATE_SMOKE_ALARM_OFF);
 						else
 							throw new \Exception('Unknown SmokeDetectorSensor state "' . (String)$state->IsSmokeAlarm . '"', 104);
@@ -493,16 +493,16 @@ class SmartHome
 
 					case LogicalDevice::DEVICE_TYPE_ROOM_TEMPERATURE_ACTUATOR:
 						$device->setPointTemperature((float)$state['PtTmp']);
-						if ((String)$state['OpnMd'] == 'Auto')
+						if (strcasecmp((String)$state['OpnMd'],'Auto')==0)
 							$device->setOperationMode(RoomTemperatureActuator::ROOM_TEMPERATURE_ACTUATOR_MODE_AUTO);
-						elseif ((String)$state['OpnMd'] == 'Manu')
+						elseif (strcasecmp((String)$state['OpnMd'],'Manu')==0)
 							$device->setOperationMode(RoomTemperatureActuator::ROOM_TEMPERATURE_ACTUATOR_MODE_MANUAL);
 						else
 							throw new \Exception('Unknown RoomTemperatureActuator state "' . (String)$state['OpnMd'] . '"', 104);
 
-						if ((String)$state['WRAc'] == 'False')
+						if (strcasecmp((String)$state['WRAc'],'False')==0)
 							$device->setWindowReductionMode(RoomTemperatureActuator::ROOM_TEMPERATURE_ACTUATOR_WINDOW_REDUCTION_INACTIVE);
-						elseif ((String)$state['WRAc'] == 'True')
+						elseif (strcasecmp((String)$state['WRAc'],'True')==0)
 							$device->setWindowReductionMode(RoomTemperatureActuator::ROOM_TEMPERATURE_ACTUATOR_WINDOW_REDUCTION_ACTIVE);
 						else
 							throw new \Exception('Unknown RoomTemperatureActuator mode "' . (String)$state['WRAc'] . '"', 106);
@@ -525,7 +525,12 @@ class SmartHome
 						break;
 
 					case LogicalDevice::DEVICE_TYPE_GENERIC_ACTUATOR:
-						// TODO Generic actuator state
+						if (strcasecmp((String)$state->Ppts->Ppt['Value'],'true')==0)
+							$device->setState(GenericActuator::GENERIC_ACTUATOR_STATE_ON);
+						elseif (strcasecmp((String)$state->Ppts->Ppt['Value'],'false')==0)
+							$device->setState(GenericActuator::GENERIC_ACTUATOR_STATE_OFF);
+						else
+							throw new \Exception('Unknown GenericActuator state "' . (String)$state['IsOn'] . '"', 104);
 						break;
 
 					case LogicalDevice::DEVICE_TYPE_GENERIC_SENSOR:
@@ -541,10 +546,24 @@ class SmartHome
 						break;
 
 					case LogicalDevice::DEVICE_TYPE_THERMOSTAT_ACTUATOR:
+						// TODO
+						break;
+
 					case LogicalDevice::DEVICE_TYPE_VALVE_ACTUATOR:
+						// TODO
+						break;
+
 					case LogicalDevice::DEVICE_TYPE_TEMPERATURE_SENSOR:
+						// TODO
+						break;
+
 					case LogicalDevice::DEVICE_TYPE_HUMIDITY_SENSOR:
+						// TODO
+						break;
+
 					case LogicalDevice::DEVICE_TYPE_MOTION_DETECTION_SENSOR:
+						// TODO
+						break;
 
 					default:
 						throw new \Exception('Unknown LogicalDevice type: ' . $device->getType(), 105);
@@ -811,3 +830,4 @@ class SmartHome
 		$this->logicalDevices = $logicalDevices;
 	}
 }
+?>
